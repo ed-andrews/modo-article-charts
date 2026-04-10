@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Over 20 GW of AR4+ capacity is expected live under the negative price clause by 2030</title>
+  <title>AR4+ CfD capacity commissioned by technology (GW)</title>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800;1,9..40,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/plotly.js/2.35.0/plotly.min.js"></script>
   <style>
@@ -100,8 +100,8 @@
   <div class="chart-wrapper">
     <!-- Header: regular weight (no bold by default; only use <b> if user requests it) -->
     <div class="chart-header">
-      <h1>Over <b>20 GW</b> of AR4+ capacity is expected live under the negative price clause by 2030</h1>
-      <div class="chart-subheader">Cumulative contracted capacity reaching operation (GW), AR4 to AR7</div>
+      <h1>AR4+ CfD capacity commissioned by technology</h1>
+      <div class="chart-subheader">Cumulative operational capacity under Allocation Round 4 and later CfD contracts (GW), 2023–2030</div>
     </div>
 
     <!-- Plotly chart area -->
@@ -110,8 +110,8 @@
     <!-- Footer: source + notes on left, wordmark on right -->
     <div class="chart-footer">
       <div class="chart-footer-left">
-        <div class="chart-source">Source: LCCC CfD Register (March 2026), Modo Energy</div>
-        
+        <div class="chart-source">Source: DESNZ CfD register, project commissioning data, Modo Energy analysis</div>
+        <div class="chart-note">Note: 2027–2030 figures reflect expected commissioning based on awarded contracts. Data shown as year-end totals.</div>
       </div>
       <div class="chart-wordmark">MODOENERGY</div>
     </div>
@@ -120,29 +120,135 @@
   <script>
     // ===== DATA =====
     
-const data = [
-  {x:[2025, 2026, 2027, 2028, 2029, 2030, 2031, 2032], y:[0.3, 1.5, 4.2, 8.8, 15.2, 20.8, 24.5, 27.1],
-   type:'scatter', mode:'lines', name:'Solar PV',
-   fill:'tozeroy', fillcolor:'rgba(247,193,145,0.7)',
-   line:{color:'#f7c191', width:0, shape:'spline'},
-   stackgroup:'one',
-   hovertemplate:'%{y:.1f} GW<extra>Solar PV</extra>'},
-  {x:[2025, 2026, 2027, 2028, 2029, 2030, 2031, 2032], y:[0.1, 0.8, 3.8, 13.5, 24.2, 30.8, 35.2, 38.4],
-   type:'scatter', mode:'lines', name:'Offshore wind',
-   fill:'tonexty', fillcolor:'rgba(70,126,228,0.7)',
-   line:{color:'#467ee4', width:0, shape:'spline'},
-   stackgroup:'one',
-   hovertemplate:'%{y:.1f} GW<extra>Offshore wind</extra>'},
-  {x:[2025, 2026, 2027, 2028, 2029, 2030, 2031, 2032], y:[0.05, 0.3, 1.2, 3.5, 5.8, 7.2, 8.1, 9.0],
-   type:'scatter', mode:'lines', name:'Onshore wind',
-   fill:'tonexty', fillcolor:'rgba(39,172,96,0.7)',
-   line:{color:'#27ac60', width:0, shape:'spline'},
-   stackgroup:'one',
-   hovertemplate:'%{y:.1f} GW<extra>Onshore wind</extra>'},
-];
+const MODO_COLORS = ['#467ee4','#27ac60','#f7c191','#e85f37','#81b1fe','#6cdd9c'];
+
+const years = ['2023-01-01','2024-01-01','2025-01-01','2026-01-01',
+               '2027-01-01','2028-01-01','2029-01-01','2030-01-01'];
+
+// Solar PV
+const traceSolar = {
+  type: 'scatter',
+  name: 'Solar PV',
+  x: years,
+  y: [0.5, 1.2, 2.8, 4.2, 6.0, 8.5, 11.0, 13.5],
+  mode: 'lines',
+  line: { width: 0, shape: 'hv' },
+  fill: 'tozeroy',
+  fillcolor: 'rgba(247,193,145,0.80)',
+  stackgroup: 'cfd',
+  hovertemplate: '%{y:.1f} GW<extra>Solar PV</extra>',
+};
+
+// Onshore wind
+const traceOnshore = {
+  type: 'scatter',
+  name: 'Onshore wind',
+  x: years,
+  y: [0.2, 0.6, 1.0, 1.8, 2.8, 3.8, 4.8, 5.5],
+  mode: 'lines',
+  line: { width: 0, shape: 'hv' },
+  fill: 'tonexty',
+  fillcolor: 'rgba(39,172,96,0.75)',
+  stackgroup: 'cfd',
+  hovertemplate: '%{y:.1f} GW<extra>Onshore wind</extra>',
+};
+
+// Offshore wind
+const traceOffshore = {
+  type: 'scatter',
+  name: 'Offshore wind',
+  x: years,
+  y: [0.0, 0.8, 2.5, 4.0, 7.0, 11.5, 16.0, 20.0],
+  mode: 'lines',
+  line: { width: 0, shape: 'hv' },
+  fill: 'tonexty',
+  fillcolor: 'rgba(70,126,228,0.75)',
+  stackgroup: 'cfd',
+  hovertemplate: '%{y:.1f} GW<extra>Offshore wind</extra>',
+};
+
+// Vertical annotation line for "today" (Apr 2026)
+const data = [traceSolar, traceOnshore, traceOffshore];
+
 
     // ===== LAYOUT =====
-    const layout = {"font": {"family": "\"DM Sans\", sans-serif", "color": "#4a4a4a", "size": 12}, "paper_bgcolor": "rgba(0,0,0,0)", "plot_bgcolor": "rgba(0,0,0,0)", "margin": {"t": 10, "r": 20, "b": 40, "l": 0, "pad": 0}, "xaxis": {"showgrid": false, "showline": false, "automargin": true, "tickfont": {"size": 12, "color": "#4a4a4a", "family": "\"DM Sans\", sans-serif"}, "tickcolor": "rgba(0,0,0,0)", "tickmode": "array", "tickvals": [2025, 2026, 2027, 2028, 2029, 2030, 2031, 2032], "ticktext": ["2025", "2026", "2027", "2028", "2029", "2030", "2031", "2032"]}, "yaxis": {"showgrid": true, "gridcolor": "#E8E8E8", "gridwidth": 1, "showline": false, "automargin": true, "zeroline": true, "zerolinecolor": "#D0D0D0", "zerolinewidth": 1, "tickfont": {"size": 12, "color": "#4a4a4a", "family": "\"DM Sans\", sans-serif"}, "tickcolor": "rgba(0,0,0,0)", "title": {"text": "GW", "font": {"size": 11}}, "ticksuffix": " GW", "range": [0, 80]}, "legend": {"orientation": "h", "yanchor": "bottom", "y": 1.02, "xanchor": "left", "x": 0, "font": {"size": 13, "color": "#4a4a4a", "family": "\"DM Sans\", sans-serif"}, "bgcolor": "rgba(255,255,255,0)", "borderwidth": 0, "itemsizing": "constant"}, "hovermode": "x unified", "hoverlabel": {"bgcolor": "#333333", "font": {"family": "\"DM Sans\", sans-serif", "size": 13, "color": "#FFFFFF"}, "bordercolor": "#333333"}};
+    
+const layout = {
+  font: { family: '"DM Sans", sans-serif', color: '#4a4a4a', size: 12 },
+  paper_bgcolor: 'rgba(0,0,0,0)',
+  plot_bgcolor: 'rgba(0,0,0,0)',
+  margin: { t: 10, r: 20, b: 40, l: 0, pad: 0 },
+  title: null,
+  
+  xaxis: {
+    showgrid: false,
+    showline: false,
+    tickfont: { size: 12, color: '#4a4a4a', family: '"DM Sans", sans-serif' },
+    tickcolor: 'rgba(0,0,0,0)',
+    tickformat: '%Y',
+    dtick: 'M12',
+    automargin: true,
+  },
+  
+  yaxis: {
+    showgrid: true,
+    gridcolor: '#E8E8E8',
+    gridwidth: 1,
+    showline: false,
+    tickfont: { size: 12, color: '#4a4a4a', family: '"DM Sans", sans-serif' },
+    tickcolor: 'rgba(0,0,0,0)',
+    zeroline: true,
+    zerolinecolor: '#D0D0D0',
+    zerolinewidth: 1,
+    automargin: true,
+    ticksuffix: ' GW',
+    range: [0, 42],
+  },
+  
+  legend: {
+    orientation: 'h',
+    yanchor: 'bottom',
+    y: 1.02,
+    xanchor: 'left',
+    x: 0,
+    font: { size: 12, color: '#4a4a4a', family: '"DM Sans", sans-serif' },
+    bgcolor: 'rgba(255,255,255,0)',
+    borderwidth: 0,
+    itemsizing: 'constant',
+    traceorder: 'normal',
+  },
+  
+  hovermode: 'x unified',
+  hoverlabel: {
+    bgcolor: '#333333',
+    font: { family: '"DM Sans", sans-serif', size: 13, color: '#FFFFFF' },
+    bordercolor: '#333333',
+  },
+  
+  shapes: [{
+    type: 'line',
+    x0: '2026-04-01',
+    x1: '2026-04-01',
+    y0: 0,
+    y1: 1,
+    xref: 'x',
+    yref: 'paper',
+    line: { color: '#333333', width: 1, dash: 'dot' },
+  }],
+  
+  annotations: [{
+    x: '2026-04-01',
+    y: 0.97,
+    xref: 'x',
+    yref: 'paper',
+    text: 'Today',
+    showarrow: false,
+    font: { size: 11, color: '#4a4a4a', family: '"DM Sans", sans-serif' },
+    xanchor: 'left',
+    xshift: 5,
+  }],
+};
+
 
     // ===== RENDER =====
     Plotly.newPlot('chart', data, layout, {
